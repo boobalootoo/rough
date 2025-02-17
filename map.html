@@ -16,7 +16,7 @@
 
   <style>
     body {
-      margin: 0; 
+      margin: 0;
       padding: 0;
       background-color: #000;
       color: #fff;
@@ -26,7 +26,6 @@
     h1 {
       margin: 20px 0 10px;
     }
-    /* Container for the buttons and slider */
     .controls {
       margin-bottom: 10px;
     }
@@ -55,7 +54,7 @@
       width: 600px;
       height: 600px;
       border: 2px solid #00ffcc;
-      margin: 0 auto 20px; /* center it, add bottom spacing */
+      margin: 0 auto 20px;
       position: relative;
       overflow: hidden;
     }
@@ -78,7 +77,6 @@
   </style>
 </head>
 <body>
-
   <h1>My Pixel World</h1>
 
   <div class="controls">
@@ -97,13 +95,14 @@
   </div>
 
   <script>
-    // Initialize the Leaflet map
+    // Initialize Leaflet
     const map = L.map('map', {
       center: [54.5, -2.5],
       zoom: 6,
       maxZoom: 25,
       minZoom: 6,
       layers: [
+        // Feel free to swap in https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png if needed
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
           attribution: 'Tiles © Esri — Source: Esri, etc.',
           maxNativeZoom: 18
@@ -111,35 +110,32 @@
       ]
     });
 
-    // Pixelation variables
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let overlayVisible = false;
     let gridSize = 10;
 
-    // Function to apply pixelation overlay
     function applyPixelation() {
       const size = map.getSize();
       canvas.width = size.x;
       canvas.height = size.y;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Use html2canvas to capture the Leaflet map
       html2canvas(document.getElementById('map'), { useCORS: true }).then(capturedCanvas => {
         ctx.drawImage(capturedCanvas, 0, 0, canvas.width, canvas.height);
 
         const pixelSizeX = Math.floor(canvas.width / gridSize);
         const pixelSizeY = Math.floor(canvas.height / gridSize);
 
-        for(let y = 0; y < canvas.height; y += pixelSizeY) {
-          for(let x = 0; x < canvas.width; x += pixelSizeX) {
+        for (let y = 0; y < canvas.height; y += pixelSizeY) {
+          for (let x = 0; x < canvas.width; x += pixelSizeX) {
             const width = Math.min(pixelSizeX, canvas.width - x);
             const height = Math.min(pixelSizeY, canvas.height - y);
             const imageData = ctx.getImageData(x, y, width, height);
             const data = imageData.data;
 
             let r = 0, g = 0, b = 0, count = 0;
-            for(let i=0; i < data.length; i += 4) {
+            for (let i = 0; i < data.length; i += 4) {
               r += data[i];
               g += data[i + 1];
               b += data[i + 2];
@@ -159,22 +155,19 @@
       });
     }
 
-    // Overlay toggle button
     document.getElementById('toggleOverlay').addEventListener('click', () => {
       overlayVisible = !overlayVisible;
       canvas.style.display = overlayVisible ? 'block' : 'none';
-      if(overlayVisible) applyPixelation();
+      if (overlayVisible) applyPixelation();
     });
 
-    // When map moves, update pixelation if overlay is visible
-    map.on('moveend', () => { 
-      if(overlayVisible) applyPixelation();
+    map.on('moveend', () => {
+      if (overlayVisible) applyPixelation();
     });
-    map.on('zoomend', () => { 
-      if(overlayVisible) applyPixelation();
+    map.on('zoomend', () => {
+      if (overlayVisible) applyPixelation();
     });
 
-    // Zoom buttons
     document.getElementById('zoomIn').addEventListener('click', () => {
       map.zoomIn(2);
     });
@@ -182,18 +175,16 @@
       map.zoomOut(2);
     });
 
-    // Undo button (not implemented)
     document.getElementById('undo').addEventListener('click', () => {
       alert('Undo not implemented yet!');
     });
 
-    // Grid size slider
     const gridSizeSlider = document.getElementById('gridSizeSlider');
     const gridSizeValue = document.getElementById('gridSizeValue');
     gridSizeSlider.addEventListener('input', () => {
       gridSize = parseInt(gridSizeSlider.value);
       gridSizeValue.textContent = gridSize;
-      if(overlayVisible) applyPixelation();
+      if (overlayVisible) applyPixelation();
     });
 
     // Example sightings with 8-bit icons
