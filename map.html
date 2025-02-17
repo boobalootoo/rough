@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pixel World Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Silkscreen', cursive;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            margin: 0; padding: 0;
+        }
+        #mapContainer {
+            width: 600px; height: 600px; border: 1px solid black;
+            position: relative; margin: 20px auto; overflow: hidden;
+        }
+        #map {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;
+        }
+        #canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; display: none; z-index: 2;
+        }
+        button {
+            margin: 10px; padding: 10px 20px;
+            font-size: 16px; border: 2px solid #00ffcc;
+            background: transparent; color: #00ffcc;
+            border-radius: 10px; cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ffcc;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Pixel World</h1>
+    <button id="toggleOverlay">Toggle Pixelation Overlay</button>
+    <button id="zoomIn">X10 ZOOM IN</button>
+    <button id="zoomOut">X10 ZOOM OUT</button>
+    <button id="undo">UNDO</button>
+    <label for="gridSizeSlider">Grid Size:</label>
+    <input type="range" id="gridSizeSlider" min="1" max="250" step="10" value="10">
+    <span id="gridSizeValue">10</span>
+
+    <div id="mapContainer">
+        <div id="map"></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const map = L.map('map', {
+            center: [54.5, -2.5],
+            zoom: 6,
+            maxZoom: 25,
+            minZoom: 6,
+            layers: [
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles © Esri — Source: Esri, etc.',
+                    maxNativeZoom: 18
+                })
+            ]
+        });
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let overlayVisible = false;
+        let gridSize = 10;
+
+        function applyPixelation() {
+            const size = map.getSize();
+            canvas.width = size.x;
+            canvas.height = size.y;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            html2canvas(document.getElementById('map'), { useCORS: true }).then((capturedCanvas) => {
+                ctx.drawImage(capturedCanvas, 0, 0, canvas.width, canvas.height);
+                const pixelSizeX = Math.floor(canvas.width / gridSize);
+                const pixelSizeY = Math.floor(canvas.height / gridSize);
+                for(let y = 0; y<canvas.height; y+=pixelSizeY) {
+                    for(let x = 0; x<canvas.width; x+=pixelSizeX) {
+                        let width = Math.min(pixelSizeX, canvas.width - x);
+                        let height = Math.min(pixelSizeY, canvas.height - y);
+                        const imageData = ctx.getImageData(x, y, width, height);
+                        const data = imageData.data;
+                        let r=0, g=0, b=0, count=0;
+                        for(let i=0; i<data.length; i+=4){
+                            r += data[i];
+                            g += data[i+1];
+                            b += data[i+2];
+                            count++;
+                        }
+                        r = Math.floor(r/count);
+                        g = Math.floor(g/count);
+                        b = Math.floor(b/count);
+                        ctx.fillStyle = `rgb(${r},${g},${b})`;
+                        ctx.fillRect(x, y, width, height);
+                        ctx.strokeStyle = \"rgba(0,0,0,0.2)\";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x,y,width,height);
+                    }
+                }
+            });
+        }
+
+        document.getElementById('toggleOverlay').addEventListener('click', () => {
+            overlayVisible = !overlayVisible;
+            canvas.style.display = overlayVisible ? 'block' : 'none';
+            if(overlayVisible) applyPixelation();
+        });
+
+        map.on('moveend', () => {
+            if(overlayVisible) applyPixelation();
+        });
+        map.on('zoomend', () => {
+            if(overlayVisible) applyPixelation();
+        });
+
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            map.zoomIn(2);
+        });
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            map.zoomOut(2);
+        });
+        document.getElementById('undo').addEventListener('click', () => {
+            alert('Undo not implemented yet!');
+        });
+
+        const gridSizeSlider = document.getElementById('gridSizeSlider');
+        const gridSizeValue = document.getElementById('gridSizeValue');
+        gridSizeSlider.addEventListener('input', () => {
+            gridSize = parseInt(gridSizeSlider.value);
+            gridSizeValue.textContent = gridSize;
+            if(overlayVisible) applyPixelation();
+        });
+
+        // Example sightings with 8-bit icons
+        const sightings = [
+          {
+            species: 'Magpie',
+            coords: [55.0, -2.0],
+            image: '8bit_species_images/magpie.png'
+          },
+          {
+            species: 'Black Grouse',
+            coords: [54.0, -3.0],
+            image: '8bit_species_images/black_grouse.png'
+          }
+        ];
+
+        sightings.forEach(s => {
+          L.marker(s.coords, {
+            icon: L.icon({
+              iconUrl: s.image,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            })
+          }).addTo(map).bindPopup(s.species);
+        });
+    </script>
+</body>
+</html>

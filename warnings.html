@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy & Data Disclaimer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Silkscreen', cursive;
+      margin: 0; padding: 0;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      margin: 50px auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.4;
+    }
+    .btn-container {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Silkscreen', cursive;
+    }
+    .accept {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .decline {
+      background-color: #d9534f;
+      color: white;
+    }
+    a {
+      text-decoration: none;
+      color: #3366bb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Privacy & Data Disclaimer</h1>
+    <p>
+      This game requires access to your <strong>camera</strong> for species identification
+      and <strong>location data</strong> for mapping observations.
+    </p>
+    <p>
+      <strong>Your data:</strong> Images are processed locally and not stored unless you
+      choose to save them. Location data is used only for mapping and not shared with third
+      parties.
+    </p>
+    <p>
+      By continuing, you agree to our <a href="privacy-policy.html">Privacy Policy</a> and
+      <a href="terms.html">Terms of Use</a>.
+    </p>
+    <div class="btn-container">
+      <button class="accept" onclick="proceedToLogin()">Accept & Continue</button>
+      <button class="decline" onclick="declineAccess()">Decline</button>
+    </div>
+  </div>
+
+  <script>
+    function proceedToLogin(){
+      // Goes to login.html if user accepts
+      window.location.href = 'login.html';
+    }
+    function declineAccess(){
+      alert('You must accept the terms to play the game.');
+    }
+  </script>
+</body>
+</html>
