@@ -25,29 +25,40 @@
             width: 100%; height: 100%;
             object-fit: cover; z-index: 1;
         }
+        /* Updated: pointer-events and cursor */
         #portal {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute; 
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px; height: 400px;
+            width: 400px; 
+            height: 400px;
             background: url('portalimage.png') no-repeat center;
             background-size: contain;
             animation: spin 3s linear infinite;
-            z-index: 2; pointer-events: none;
+            z-index: 2;
+            pointer-events: auto;  /* ALLOW clicks */
+            cursor: pointer;       /* Show pointer cursor */
         }
         @keyframes spin {
             0%   { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         #canvas {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute; 
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 250px; height: 250px;
+            width: 250px; 
+            height: 250px;
             border-radius: 50%;
-            overflow: hidden; z-index: 3;
+            overflow: hidden; 
+            z-index: 3;
         }
         button {
             position: absolute;
-            top: 20px; right: 20px;
+            top: 20px; 
+            right: 20px;
             padding: 10px 20px;
             font-size: 14px;
             border: 2px solid #00ffcc;
@@ -60,8 +71,12 @@
             color: #000;
         }
         #portal-instruction {
-            position: absolute; bottom: 20px; width: 100%;
-            text-align: center; z-index: 4; font-size: 16px;
+            position: absolute; 
+            bottom: 20px; 
+            width: 100%;
+            text-align: center; 
+            z-index: 4; 
+            font-size: 16px;
         }
     </style>
 </head>
@@ -74,7 +89,7 @@
     <div id="portal-container">
         <video id="camera" autoplay muted></video>
         <canvas id="canvas"></canvas>
-        <!-- Updated link to identifyer.html -->
+        <!-- The clickable portal -->
         <div id="portal" onclick="goToIdentification()"></div>
         <div id="portal-instruction">Click the portal!</div>
     </div>
@@ -106,9 +121,8 @@
         }
         pixelate();
 
-        function goToIdentification(){
-          // Goes to identifyer.html
-          window.location.href = 'identifyer.html';
+        function goToIdentification() {
+            window.location.href = 'identifyer.html';
         }
     </script>
 </body>
